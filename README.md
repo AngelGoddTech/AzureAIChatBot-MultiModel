@@ -92,10 +92,13 @@ A production-ready multi-model AI chatbot powered by Azure AI Foundry and Azure 
    ```bash
    az webapp create --name your-chatbot-app --resource-group your-rg --plan your-plan
    ```
+2. Configure GitHub Actions secrets in your repository:
+   - `AZURE_CREDENTIALS` – Service principal credentials
+   - `REGISTRY_LOGIN_SERVER`, `REGISTRY_USERNAME`, `REGISTRY_PASSWORD` – Azure Container Registry details
+   - `AZURE_WEBAPP_NAME` – Target Web App name
+   - `REACT_APP_API_URL` and `REACT_APP_WS_URL` – Public endpoints used by the frontend
 
-2. Configure GitHub Actions secrets in your repository
-
-3. Push to main branch to trigger automatic deployment
+3. Push to the `main` branch to trigger automatic deployment
 
 ### Environment Variables
 

@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  backend:
+    image: ${REGISTRY_LOGIN_SERVER}/chatbot-backend:${IMAGE_TAG}
+    env_file:
+      - ./backend/.env
+  frontend:
+    image: ${REGISTRY_LOGIN_SERVER}/chatbot-frontend:${IMAGE_TAG}
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - REACT_APP_WS_URL=${REACT_APP_WS_URL}
+  redis:
+    image: redis:7-alpine
