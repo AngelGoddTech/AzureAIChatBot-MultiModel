@@ -5,17 +5,45 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+  IMAGE_TAG: ${{ github.sha }}
+  REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+  REACT_APP_WS_URL: ${{ secrets.REACT_APP_WS_URL }}
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Build and deploy
-      run: |
-        echo "Add your Azure deployment steps here"
+      - uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Docker Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and push backend image
+        run: |
+          docker build -t $REGISTRY_LOGIN_SERVER/chatbot-backend:$IMAGE_TAG ./backend
+          docker push $REGISTRY_LOGIN_SERVER/chatbot-backend:$IMAGE_TAG
+
+      - name: Build and push frontend image
+        run: |
+          docker build -t $REGISTRY_LOGIN_SERVER/chatbot-frontend:$IMAGE_TAG ./frontend
+          docker push $REGISTRY_LOGIN_SERVER/chatbot-frontend:$IMAGE_TAG
+
+      - name: Generate compose file
+        run: envsubst < docker-compose.azure.yml > docker-compose.release.yml
+
+      - name: Deploy to Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          configuration-file: docker-compose.release.yml

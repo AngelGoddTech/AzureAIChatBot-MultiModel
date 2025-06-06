@@ -8,8 +8,7 @@
 ## Steps
 
 1. Create Azure resources
-2. Configure environment variables
-3. Build Docker images
-4. Deploy to Azure Web App
+2. Configure GitHub Actions secrets with your Azure credentials and container registry information
+3. Push to the `main` branch to build Docker images and deploy automatically
 
-See README.md for detailed instructions.
+See `README.md` for secret names and additional details.
